@@ -44,3 +44,32 @@ contract Loan {
         selfdestruct(payable(lender));
     }
 }
+
+contract LoanRequest {
+    address public borrower;
+    string public loanPurpose;
+    uint256 public loanAmount;
+    uint256 public loanDuration;
+    bool public accepted;
+
+    constructor(
+        string memory _loanPurpose,
+        uint256 _loanAmount,
+        uint256 _loanDuration
+    ) { 
+        loanPurpose = _loanPurpose;
+        loanAmount = _loanAmount;
+        loanDuration = _loanDuration;
+        borrower = msg.sender;
+    }
+
+    event LoanRequestAccepted(address loan);
+    Loan public loan;
+
+    function lendMatic() public payable {
+        require(msg.value == loanAmount, "Pay off amount value is not correct");
+        loan = new Loan(msg.sender, borrower, loanAmount, loanDuration);
+        accepted = true;
+        emit LoanRequestAccepted(address(loan));
+    }
+}
